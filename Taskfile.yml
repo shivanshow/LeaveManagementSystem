@@ -1,0 +1,48 @@
+version: '3'
+
+vars:
+  GOOS: "{{default OS .GOOS}}"
+  MVNW: '{{if eq .GOOS "windows"}}mvnw.cmd{{else}}./mvnw{{end}}'
+  APPS_DC_FILE: "deployment/docker-compose/apps.yml"
+  SLEEP_CMD: '{{if eq .GOOS "windows"}}timeout{{else}}sleep{{end}}'
+
+tasks:
+  default:
+    cmds:
+      - task: test
+
+  test:
+    deps: [format]
+    cmds:
+      - "{{.MVNW}} clean verify"
+
+  format:
+    cmds:
+      - "{{.MVNW}} spotless:apply"
+
+  build:
+    cmds:
+      - "{{.MVNW}} clean verify -DskipTests"
+      - "{{.MVNW}} spring-boot:build-image -DskipTests"
+
+  start:
+    deps: [build]
+    cmds:
+      - "docker compose -f {{.APPS_DC_FILE}} up -d"
+
+  stop:
+    cmds:
+      - "docker compose -f {{.APPS_DC_FILE}} stop"
+      - "docker compose -f {{.APPS_DC_FILE}} rm -f"
+
+  restart:
+    cmds:
+      - task: stop
+      - task: sleep
+      - task: start
+
+  sleep:
+    vars:
+      DURATION: "{{default 5 .DURATION}}"
+    cmds:
+      - "{{.SLEEP_CMD}} {{.DURATION}}"
