@@ -5,7 +5,6 @@ vars:
   MVNW: '{{if eq .GOOS "windows"}}mvnw.cmd{{else}}./mvnw{{end}}'
   APPS_DC_FILE: "deployment/docker-compose/apps.yml"
   SLEEP_CMD: '{{if eq .GOOS "windows"}}timeout{{else}}sleep{{end}}'
-  IMAGE_NAME: "pankhhudi/leavemanagementsystem:latest"
 
 tasks:
   default:
@@ -23,13 +22,8 @@ tasks:
 
   build:
     cmds:
-      - "{{.MVNW}} clean package -DskipTests"
-      - "docker build -t {{.IMAGE_NAME}} ."
-
-  push:
-    deps: [build]
-    cmds:
-      - "docker push {{.IMAGE_NAME}}"
+      - "{{.MVNW}} clean verify -DskipTests"
+      - "{{.MVNW}} spring-boot:build-image -DskipTests"
 
   start:
     deps: [build]
