@@ -2,6 +2,7 @@ package com.backend.leavemanagementsystem.entity;
 
 import com.backend.leavemanagementsystem.utils.LeaveStatus;
 import com.backend.leavemanagementsystem.utils.LeaveType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "leave_requests")
 public class LeaveRequest {
@@ -38,6 +40,7 @@ public class LeaveRequest {
     // This is the "many" side of the many-to-one relationship.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id", referencedColumnName = "id", nullable = false)
+    @JsonBackReference
     private Employee employee;
 
     @Column(name = "created_at", updatable = false)
@@ -45,4 +48,15 @@ public class LeaveRequest {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
