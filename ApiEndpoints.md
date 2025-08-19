@@ -4,7 +4,7 @@
 
 ### Login
 
-* **URL:** `POST http://localhost:8080/auth/login`
+* **URL:** `POST http://localhost:8080/api/auth/login`
 * **Request Body:**
 
 ```json
