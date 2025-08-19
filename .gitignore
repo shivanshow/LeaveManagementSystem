@@ -33,4 +33,5 @@ build/
 .vscode/
 
 # Spring Boot config
-deployment/docker-compose/.env
+#deployment/docker-compose/.envsrc/main/resources/application.properties
+#.env
